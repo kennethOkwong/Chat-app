@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "1019380535390",
+    "project_id": "chat-app-e645d",
+    "storage_bucket": "chat-app-e645d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1019380535390:android:a162a3def101834817e4cf",
+        "android_client_info": {
+          "package_name": "com.cadenny.chat_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1019380535390-bd3oitg06jiidl41ooj13ocla36b903r.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCcPKIZgLGtPrkI2QR7lz81gmB2XhpLZzo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1019380535390-bd3oitg06jiidl41ooj13ocla36b903r.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1019380535390-t4qa8doe551uh7sdo1q8he3jnk3qeq06.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.cadenny.chatApp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
