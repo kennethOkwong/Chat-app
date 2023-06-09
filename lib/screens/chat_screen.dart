@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:chat_app/widget/chats.dart';
 import 'package:chat_app/widget/new_message.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -25,8 +27,10 @@ class _ChatScreenState extends State<ChatScreen> {
       'text': text,
       'user_name': userDetails.data()!['user_name'],
       'image_url': userDetails.data()!['image_url'],
+      'user_id': userDetails.data()!['user_id'],
       'time_stamp': Timestamp.now(),
     });
+    log('message');
   }
 
   @override

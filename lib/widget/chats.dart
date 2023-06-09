@@ -1,48 +1,100 @@
+import 'dart:developer';
+
+import 'package:chat_app/widget/message_burbble.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
-class Chats extends StatelessWidget {
+final _firebaseMessaging = FirebaseMessaging.instance;
+
+class Chats extends StatefulWidget {
   const Chats({super.key});
 
   @override
+  State<Chats> createState() => _ChatsState();
+}
+
+class _ChatsState extends State<Chats> {
+  //function to setup Push notification
+  void _setupPushNotification() async {
+    _firebaseMessaging.requestPermission();
+
+    _firebaseMessaging.subscribeToTopic('chat');
+  }
+
+  //init function
+  @override
+  void initState() {
+    super.initState();
+    _setupPushNotification();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final authenticatedUser = FirebaseAuth.instance.currentUser!;
+
     return StreamBuilder(
       stream: FirebaseFirestore.instance
           .collection('chats')
           .orderBy(
             'time_stamp',
-            descending: false,
+            descending: true,
           )
           .snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const SizedBox(
-            width: 20,
-            height: 20,
+      builder: (ctx, chatSnapshots) {
+        if (chatSnapshots.connectionState == ConnectionState.waiting) {
+          return const Center(
             child: CircularProgressIndicator(),
           );
         }
 
-        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+        if (!chatSnapshots.hasData || chatSnapshots.data!.docs.isEmpty) {
           return const Center(
-            child: Text('No messages'),
+            child: Text('No messages found.'),
           );
         }
 
-        if (snapshot.hasError) {
+        if (chatSnapshots.hasError) {
           return const Center(
-            child: Text('Oops.. Something went wrong'),
+            child: Text('Something went wrong...'),
           );
         }
+
+        final loadedMessages = chatSnapshots.data!.docs;
 
         return ListView.builder(
-          itemCount: snapshot.data!.docs.length,
-          itemBuilder: (context, index) {
-            final chats = snapshot.data!.docs;
-            return ListTile(
-              title: Text(chats[index]['text']),
-            );
+          padding: const EdgeInsets.only(
+            bottom: 40,
+            left: 13,
+            right: 13,
+          ),
+          reverse: true,
+          itemCount: loadedMessages.length,
+          itemBuilder: (ctx, index) {
+            final chatMessage = loadedMessages[index].data();
+            final nextChatMessage = index + 1 < loadedMessages.length
+                ? loadedMessages[index + 1].data()
+                : null;
+
+            final currentMessageUserId = chatMessage['user_id'];
+            final nextMessageUserId =
+                nextChatMessage != null ? nextChatMessage['user_id'] : null;
+            final nextUserIsSame = nextMessageUserId == currentMessageUserId;
+
+            if (nextUserIsSame) {
+              return MessageBubble.next(
+                message: chatMessage['text'],
+                isMe: authenticatedUser.uid == currentMessageUserId,
+              );
+            } else {
+              return MessageBubble.first(
+                userImage: chatMessage['image_url'],
+                username: chatMessage['user_name'],
+                message: chatMessage['text'],
+                isMe: authenticatedUser.uid == currentMessageUserId,
+              );
+            }
           },
         );
       },
